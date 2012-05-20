@@ -1,0 +1,3 @@
+DB_URL=jdbc:mysql://localhost:3306/clean_13
+DB_USER=lasse_dev
+DB_PWD=pust
