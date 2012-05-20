@@ -1,0 +1,3 @@
+DB_URL=jdbc:mysql://localhost:3306/clean_12_dbchangelog
+DB_USER=lasse_dev
+DB_PWD=xxxx

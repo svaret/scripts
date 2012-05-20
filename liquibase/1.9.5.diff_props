@@ -1,0 +1,3 @@
+DB_URL=jdbc:mysql://localhost:3306/pust07_195
+DB_USER=root
+DB_PWD=admin
