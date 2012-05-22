@@ -1,37 +1,36 @@
 USAGE="USAGE: lb_cmd.sh <liquibase command> [liquibase property file]"
 
-liquibaseVersion=`java -jar $LIQUIBASE_JAR --version`
-echo "$liquibaseVersion"
+if [ -z $LIQUIBASE_DEV_HOME ]; then
+	echo "LIQUIBASE_DEV_HOME not set. Using current directory."
+	LIQUIBASE_DEV_HOME=.
+fi
 
-while getopts c: option
-do
-	case $option in
-	c) CONTEXT="--contexts=""$OPTARG";;
-	esac
-done
-shift $(($OPTIND -1))
-
-if [ $# -eq 0 ]; then
-  echo "ERROR: Missing liquibase command"
+# read liquibase configuration
+LIQUIBASE_CONF=$LIQUIBASE_DEV_HOME/liquibase.conf
+if [ ! -f $LIQUIBASE_CONF ]; then
+  echo "ERROR: Missing liquibase config file '$LIQUIBASE_CONF'"
   echo $USAGE
   exit -1
 fi
+. $LIQUIBASE_CONF
 
-# Set version specific stuff
-versionStr=`echo "$liquibaseVersion" | sed "s/Liqui[Bb]ase Version: //"` 
-case $versionStr in
-  1.9.3)
-    logLevel=finest;
-    ;;
-  1.9.5)
-    logLevel=finest;
-    ;;
-  2.0.0)
-    logLevel=debug;
-    ;;
-esac
+java -jar $LIQUIBASE_JAR --version
 
-# liquibase-kommando
+#while getopts c: option
+#do
+#	case $option in
+#	c) CONTEXT="--contexts=""$OPTARG";;
+#	esac
+#done
+#shift $(($OPTIND -1))
+
+#if [ $# -eq 0 ]; then
+#  echo "ERROR: Missing liquibase command"
+#  echo $USAGE
+#  exit -1
+#fi
+
+# liquibase command
 LIQUIBASE_CMD=$1
 
 PROPERTY_FILE=$LIQUIBASE_DEV_HOME/liquibase.properties
@@ -56,31 +55,21 @@ if [ $continue == 'N' -o $continue == 'n' ]; then
   exit
 fi
 
-# Sätt liquibase-konfiguration
-LIQUIBASE_CONF=$LIQUIBASE_DEV_HOME/liquibase.conf
-if [ ! -f $LIQUIBASE_CONF ]; then
-  echo "ERROR: Missing liquibase config file '$LIQUIBASE_CONF'"
-  echo $USAGE
-  exit -1
-fi
-. $LIQUIBASE_CONF
+CLASSPATH="$DB_DRIVER"
 
-# Information för att koppla upp sig mot den databas man vill arbeta mot.
-LOCAL_MAVEN_REPO=C:/dev/maven/maven-repository
-DATABASE_DRIVER_PATH=$LOCAL_MAVEN_REPO/mysql/mysql-connector-java/5.1.6/mysql-connector-java-5.1.6.jar
-CLASSPATH="$DATABASE_DRIVER_PATH;$CLASSPATH;target/classes"
-
-# Exekverar liquibase-kommando
+# Execute liquibase command
 RUN_THIS="java -jar -Dfile.encoding=UTF-8 $LIQUIBASE_JAR --defaultsFile=$PROPERTY_FILE \
---classpath=$CLASSPATH --logLevel=$logLevel $CONTEXT $LIQUIBASE_CMD"
-echo $RUN_THIS
-banner $LIQUIBASE_CMD -w 1000
-read -p 'Continue [Y/N] ' continue
-if [ $continue == 'N' -o $continue == 'n' ]; then
-  echo
-  echo "TERMINATING"
-  exit
+--classpath=$CLASSPATH --logLevel=debug $CONTEXT $LIQUIBASE_CMD"
+if [ ! -z $LIQUIBASE_CMD ]; then
+	echo $RUN_THIS
+	echo $LIQUIBASE_CMD
+	read -p 'Continue [Y/N] ' continue
+	if [ $continue == 'N' -o $continue == 'n' ]; then
+	  echo
+	  echo "TERMINATING"
+	  exit
+	fi
 fi
-
+	
 $RUN_THIS
 
