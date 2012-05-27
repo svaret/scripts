@@ -21,18 +21,19 @@ if [ $# -ne 3 ]; then
 fi
 
 # Set version specific stuff
-versionStr=`echo "$liquibaseVersion" | sed "s/Liqui[Bb]ase Version: //"` 
-case $versionStr in
-  1.9.3)
-    logLevel=finest;
-    ;;
-  1.9.5)
-    logLevel=finest;
-    ;;
-  2.0.3)
-    logLevel=debug;
-    ;;
-esac
+#versionStr=`echo "$liquibaseVersion" | sed "s/Liqui[Bb]ase Version: //"` 
+#case $versionStr in
+#  1.9.3)
+#    logLevel=finest;
+#    ;;
+#  1.9.5)
+#    logLevel=finest;
+#    ;;
+#  2.0.3)
+#    logLevel=debug;
+#    ;;
+#esac
+logLevel=debug
 
 DIFF_MODE=$1
 if [ $DIFF_MODE != 'diff' -a $DIFF_MODE != 'diffChangeLog' ]; then
@@ -71,24 +72,24 @@ OLD_DB_PASSWORD=$DB_PWD
 
 # Exekverar liquibase-kommando
 # 1.x style
-case $versionStr in
-  1.9.3)
-java -jar $LIQUIBASE_JAR --classpath=$DB_DRIVER --logLevel=$logLevel --url=$OLD_DB_URL \
-	--username=$OLD_DB_USERNAME --password=$OLD_DB_PASSWORD \
-	$DIFF_MODE \
-	--baseUrl=$NEW_DB_URL --baseUsername=$NEW_DB_USERNAME --basePassword=$NEW_DB_PASSWORD
-    ;;
-  1.9.5)
-java -jar $LIQUIBASE_JAR --classpath=$DB_DRIVER --logLevel=$logLevel --url=$OLD_DB_URL \
-	--username=$OLD_DB_USERNAME --password=$OLD_DB_PASSWORD \
-	$DIFF_MODE \
-	--baseUrl=$NEW_DB_URL --baseUsername=$NEW_DB_USERNAME --basePassword=$NEW_DB_PASSWORD
-    ;;
-  2.0.3)
+#case $versionStr in
+#  1.9.3)
+#java -jar $LIQUIBASE_JAR --classpath=$DB_DRIVER --logLevel=$logLevel --url=$OLD_DB_URL \
+#	--username=$OLD_DB_USERNAME --password=$OLD_DB_PASSWORD \
+#	$DIFF_MODE \
+#	--baseUrl=$NEW_DB_URL --baseUsername=$NEW_DB_USERNAME --basePassword=$NEW_DB_PASSWORD
+#    ;;
+#  1.9.5)
+#java -jar $LIQUIBASE_JAR --classpath=$DB_DRIVER --logLevel=$logLevel --url=$OLD_DB_URL \
+#	--username=$OLD_DB_USERNAME --password=$OLD_DB_PASSWORD \
+#	$DIFF_MODE \
+#	--baseUrl=$NEW_DB_URL --baseUsername=$NEW_DB_USERNAME --basePassword=$NEW_DB_PASSWORD
+#    ;;
+#  2.0.3)
 java -jar $LIQUIBASE_JAR --classpath=$DB_DRIVER --logLevel=$logLevel \
 	--url=$OLD_DB_URL --username=$OLD_DB_USERNAME --password=$OLD_DB_PASSWORD \
 	$DIFF_MODE \
 	--referenceUrl=$NEW_DB_URL --referenceUsername=$NEW_DB_USERNAME --referencePassword=$NEW_DB_PASSWORD 
 #	--defaultsFile=$LIQUIBASE_PROPERTIES
-    ;;
-esac
+#    ;;
+#esac
